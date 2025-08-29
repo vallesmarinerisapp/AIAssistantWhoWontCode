@@ -23,18 +23,29 @@ def api_query():
         payload = request.get_json(force=True)
     except Exception as e:
         return jsonify({'error': f'Invalid JSON payload: {e}'}), 400
-    if not payload or not payload.get('query'):
+    if not isinstance(payload, dict):
+        return jsonify({'error': 'Error: payload must be a dict.'}), 400
+    query = payload.get('query')
+    if not query or not isinstance(query, str) or not query.strip():
         return jsonify({'error': "'query' field is required in payload."}), 400
     try:
-        assistant_text = call_openai_api(payload)
+        result = call_openai_api(payload)
     except Exception as e:
         print('Error calling LLM:', e)
         return jsonify({'error': f'Error calling LLM: {e}'}), 500
-    if isinstance(assistant_text, dict) and assistant_text.get('error'):
-        return jsonify({'error': assistant_text.get('error')}), 500
-    if isinstance(assistant_text, str) and assistant_text.startswith('Error'):
-        return jsonify({'error': assistant_text}), 500
-    return jsonify({'assistant': assistant_text})
+    if isinstance(result, str):
+        if result.startswith('Error'):
+            return jsonify({'error': result}), 500
+        return jsonify({'assistant': result})
+    if isinstance(result, dict):
+        if result.get('error'):
+            return jsonify({'error': result.get('error')}), 500
+        assistant_text = result.get('assistant') or result.get('text') or ''
+        response_payload = {'assistant': assistant_text}
+        if 'usage' in result and result.get('usage') is not None:
+            response_payload['usage'] = result.get('usage')
+        return jsonify(response_payload)
+    return jsonify({'error': 'Invalid response from LLM.'}), 500
 
 
 @app.route('/')
