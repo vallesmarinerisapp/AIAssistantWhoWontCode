@@ -1,8 +1,10 @@
-https://codeplusequalsai.com
+Live demo: https://assistant.codeplusequalsai.com/
+
+This was made with [Code+=AI](https://codeplusequalsai.com) in about 30 minutes. It is a prototype of a helpful AI assistant who will lead you to your answer rather than giving you code directly.
 
 # AI Code Assistant who won't write code
 
-A lightweight, local Flask webapp that helps you explore and reason about your codebase. The app uses the browser File System Access API so the assistant can read selected files or folders for context. The assistant is strictly prevented from returning runnable code or full file contents; it will provide high-level guidance and — if explicitly allowed in the UI — non-executable pseudo-code examples for illustration only.
+A lightweight, local Flask webapp that helps you explore and reason about your codebase. The app uses the browser File System Access API so the assistant can read selected files or folders for context. The assistant is strictly prevented from returning runnable code or full file contents; it will provide high-level guidance and, if explicitly allowed in the UI, non-executable pseudo-code examples for illustration only.
 
 ## Key features
 
@@ -11,15 +13,6 @@ A lightweight, local Flask webapp that helps you explore and reason about your c
 - Session-only chat (conversation state lives in memory and is cleared on refresh)  
 - Uses OpenAI GPT-5-nano via the server-side wrapper (llm.py); requires an OpenAI API key to be provided locally  
 - Privacy-first behavior: files are read in your browser and are not stored on the server; only the packaged context you choose to send is forwarded to the model
-
-## Screenshot / Quick usage notes
-
-The UI is laid out in three columns:
-- Left: controls and file list (buttons to open a folder, pick files, clear selection; a checkbox to include/exclude whole repo behavior; each file shows path and size and a checkbox to include it in the query context)
-- Center: chat area (message history, an input box, tone selector, send button, and a small request-timing / spinner area)
-- Right: file preview pane (click a filename on the left or a file reference mentioned by the assistant to preview it; shows truncated status and a refresh/fetch-full option)
-
-To get started, open a folder using the left-panel control, pick which files to include, type a question in the chat input, and send it. Filenames mentioned by the assistant are clickable and will open the preview pane.
 
 ## Prerequisites
 
@@ -57,12 +50,12 @@ Note: these steps assume you are comfortable with basic Python development workf
 ## Developer notes
 
 Key files and their responsibilities:
-- app.py — Flask server and the POST /api/query endpoint that forwards structured payloads to the LLM wrapper  
-- llm.py — OpenAI API wrapper: builds the system and user prompts, packages file blocks, applies server-side trimming and aggregate caps, calls GPT-5-nano, and returns assistant text or descriptive error strings  
-- templates/index.html — main UI shell delivered by Flask  
-- static/scripts.js — front-end integration for File System Access API, file selection, preview, and chat flows  
-- static/styles.css — site styling and responsive layout  
-- requirements.txt — pinned Python dependencies
+- app.py: Flask server and the POST /api/query endpoint that forwards structured payloads to the LLM wrapper  
+- llm.py: OpenAI API wrapper: builds the system and user prompts, packages file blocks, applies server-side trimming and aggregate caps, calls GPT-5-nano, and returns assistant text or descriptive error strings  
+- templates/index.html: main UI shell delivered by Flask  
+- static/scripts.js: front-end integration for File System Access API, file selection, preview, and chat flows  
+- static/styles.css: site styling and responsive layout  
+- requirements.txt: pinned Python dependencies
 
 Manual testing checklist:
 - Start the server and open the app in a Chromium-based browser.  
