@@ -1,0 +1,8 @@
+app.log
+__pycache__/
+app.db
+*.pyc
+instance/
+.env
+# all flask related files
+
