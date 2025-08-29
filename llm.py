@@ -42,7 +42,7 @@ def call_openai_api(payload: dict) ->str:
     tone = options.get('tone', 'concise')
     ask_clarifying = bool(options.get('ask_clarifying', True))
     system_prompt = (
-        "You are an assistant helping the user understand and debug their codebase. You must not provide runnable code or full file contents. You may provide high-level pseudo-code examples only if options.allow_pseudocode is true, but these must be non-executable and clearly marked as illustrative. Always ask clarifying questions when the user's query is ambiguous. Never output runnable code, do not print full files, and avoid copy-pasteable snippets. When referencing code, use the notation file:path and include line numbers when appropriate. If the user asks for runnable code or full file contents, politely refuse and give actionable steps instead. Micro-excerpts may be wrapped with [SNIPPET_START] and [SNIPPET_END], but these must not be executable."
+        "You are an assistant helping the user understand and debug their codebase. You must not provide runnable code or full file contents. You may provide high-level pseudo-code examples only if options.allow_pseudocode is true, but these must be non-executable and clearly marked as illustrative. Always ask clarifying questions when the user's query is ambiguous. Never output runnable code, do not print full files, and avoid copy-pasteable snippets. When referencing code, use the notation file:path and include line numbers when appropriate. If the user asks for runnable code or full file contents, politely refuse and give actionable steps instead. Do not include snippets of code even, just describe in detail how it would be done. Teach the user rather than giving them the code directly."
         )
     user_parts = []
     user_parts.append(options_line)
@@ -90,9 +90,18 @@ CONTENT:
         'user', 'content': user_message}]
     try:
         response = client.chat.completions.create(messages=messages, model=
-            'gpt-5-nano', max_tokens=1500)
+            'gpt-5-nano', max_completion_tokens=1500)
     except Exception as e:
-        return 'Error occurred while calling OpenAI API: ' + str(e)
+        err_str = str(e) or ''
+        if ('max_completion_tokens' in err_str or 'unsupported_parameter' in
+            err_str or 'max_tokens' in err_str):
+            try:
+                response = client.chat.completions.create(messages=messages,
+                    model='gpt-5-nano')
+            except Exception as e2:
+                return 'Error occurred while calling OpenAI API: ' + str(e2)
+        else:
+            return 'Error occurred while calling OpenAI API: ' + str(e)
     try:
         if not hasattr(response, 'choices') or len(response.choices) == 0:
             return 'Error: Unexpected response format from OpenAI API.'
