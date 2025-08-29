@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Code Assistant who won't write code</title>
+  <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header" role="banner">
+      <div>
+        <div class="title">AI Code Assistant who won't write code</div>
+        <div class="subtitle">Local assistant — reads selected files from your machine. Won't produce runnable code.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="small" id="requestTiming" aria-live="polite"></div>
+        <!-- Global centered spinner overlay (hidden by default) -->
+        <div id="spinner" class="hidden" aria-hidden="true"></div>
+      </div>
+    </header>
+
+    <main class="main" role="main">
+      <!-- Left panel: controls & file list -->
+      <section class="panel left-controls" aria-label="File and repository controls">
+        <div class="controls-row" style="align-items:center">
+          <button id="openFolderBtn" class="btn" type="button" aria-haspopup="dialog">Open Folder</button>
+          <button id="selectFilesBtn" class="btn secondary" type="button">Select files/folders</button>
+          <button id="clearSelectionBtn" class="btn secondary" type="button">Clear selection</button>
+        </div>
+
+        <div style="margin-top:10px" class="checkbox-row">
+          <input type="checkbox" id="includeRepoCheckbox" checked />
+          <label for="includeRepoCheckbox">Include whole repository (auto-exclude .git, node_modules, dist, build)</label>
+        </div>
+
+        <div style="margin-top:6px" class="checkbox-row">
+          <input type="checkbox" id="allowPseudoCheckbox" checked />
+          <label for="allowPseudoCheckbox">Allow high-level pseudo-code (non-executable)</label>
+        </div>
+
+        <div style="margin-top:8px" class="controls-row">
+          <button id="readWholeRepoBtn" class="btn" type="button">Read whole repo</button>
+        </div>
+
+        <div class="file-list" id="fileList" aria-live="polite">
+          <div class="annotations">No files selected. Click "Open Folder" to choose a repository.</div>
+        </div>
+      </section>
+
+      <!-- Center panel: chat -->
+      <section class="panel chat-panel" aria-label="Chat with assistant">
+        <div class="chat-top">
+          <div>
+            <div style="font-weight:700">Assistant</div>
+            <div class="chat-info small">Ask questions about the selected codebase. The assistant will not provide runnable code.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <label for="toneSelect" class="small" style="margin-right:6px">Tone</label>
+            <select id="toneSelect" class="tone-select" aria-label="Assistant tone">
+              <option value="concise">Concise</option>
+              <option value="detailed">Detailed</option>
+              <option value="step-by-step">Step-by-step</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="padding:8px 16px">
+          <div class="annotations small">Session-only chat (cleared on refresh)</div>
+        </div>
+
+        <div id="chatContainer" class="chat-container" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+        <div class="chat-input" role="region" aria-label="Message composer">
+          <textarea id="messageInput" placeholder="Ask about your codebase... (Ctrl+Enter to send)" aria-label="Message input"></textarea>
+          <div class="controls" style="min-width:150px">
+            <button id="sendBtn" class="send-btn" type="button">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right panel: preview -->
+      <aside class="panel" aria-label="File preview">
+        <div class="preview-header">
+          <div class="preview-title" id="previewTitle">No file selected</div>
+          <div class="preview-actions">
+            <button id="previewRefreshBtn" class="btn secondary" type="button" disabled>Refresh</button>
+          </div>
+        </div>
+
+        <div id="previewPane" class="preview-content" style="display:flex;flex-direction:column;min-height:280px">
+          <div class="annotations">Select a file from the left or click a filename mentioned by the assistant to preview it here.</div>
+        </div>
+
+        <div class="preview-footer">
+          <div class="small">Preview (read-only)</div>
+          <div>
+            <button id="previewFetchFull" class="btn secondary" type="button" disabled>Fetch full file</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      Files are read locally in your browser and not stored on the server. Relevant context is sent to the AI only when you send a query.
+    </footer>
+  </div>
+
+  <script src="static/scripts.js" defer></script>
+</body>
+</html>
