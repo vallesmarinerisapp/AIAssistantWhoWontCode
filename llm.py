@@ -27,6 +27,17 @@ def call_openai_api(payload: dict) ->str:
         return "Error: 'query' field is required in payload."
     files = payload.get('files', []) or []
     options = payload.get('options', {}) or {}
+    opt_pairs = []
+    if 'allow_pseudocode' in options:
+        opt_pairs.append(
+            f"allow_pseudocode={bool(options.get('allow_pseudocode'))}")
+    if 'tone' in options:
+        opt_pairs.append(f"tone={options.get('tone')}")
+    if 'ask_clarifying' in options:
+        opt_pairs.append(
+            f"ask_clarifying={bool(options.get('ask_clarifying'))}")
+    options_line = 'OPTIONS: ' + ' '.join(opt_pairs
+        ) if opt_pairs else 'OPTIONS:'
     allow_pseudo = bool(options.get('allow_pseudocode', False))
     tone = options.get('tone', 'concise')
     ask_clarifying = bool(options.get('ask_clarifying', True))
@@ -34,12 +45,9 @@ def call_openai_api(payload: dict) ->str:
         "You are an assistant helping the user understand and debug their codebase. You must not provide runnable code or full file contents. You may provide high-level pseudo-code examples only if options.allow_pseudocode is true, but these must be non-executable and clearly marked as illustrative. Always ask clarifying questions when the user's query is ambiguous. Never output runnable code, do not print full files, and avoid copy-pasteable snippets. When referencing code, use the notation file:path and include line numbers when appropriate. If the user asks for runnable code or full file contents, politely refuse and give actionable steps instead. Micro-excerpts may be wrapped with [SNIPPET_START] and [SNIPPET_END], but these must not be executable."
         )
     user_parts = []
-    user_parts.append(
-        f'OPTIONS: allow_pseudocode={allow_pseudo} tone={tone} ask_clarifying={ask_clarifying}'
-        )
+    user_parts.append(options_line)
     user_parts.append('USER_QUERY:')
     user_parts.append(str(query))
-    user_parts.append('\nFILES:')
     total_chars = 0
     omitted_count = 0
     for f in files:
@@ -63,12 +71,13 @@ def call_openai_api(payload: dict) ->str:
                 f"""FILE_START: path={path} size={size} truncated={str(truncated_flag_final).lower()}
 CONTENT:
 """
-                 + (content if content is not None else '') + '\nFILE_END\n')
-            if total_chars + len(file_block) > MAX_TOTAL_CHARS:
+                 + (content if content is not None else '') + '\nFILE_END')
+            block_with_sep = file_block + '\n'
+            if total_chars + len(block_with_sep) > MAX_TOTAL_CHARS:
                 omitted_count += 1
                 continue
             user_parts.append(file_block)
-            total_chars += len(file_block)
+            total_chars += len(block_with_sep)
         except Exception:
             omitted_count += 1
             continue
