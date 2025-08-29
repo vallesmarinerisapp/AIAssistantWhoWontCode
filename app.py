@@ -36,7 +36,7 @@ def api_query():
     if isinstance(result, str):
         if result.startswith('Error'):
             return jsonify({'error': result}), 500
-        return jsonify({'assistant': result})
+        return jsonify({'assistant': result}), 200
     if isinstance(result, dict):
         if result.get('error'):
             return jsonify({'error': result.get('error')}), 500
@@ -44,7 +44,7 @@ def api_query():
         response_payload = {'assistant': assistant_text}
         if 'usage' in result and result.get('usage') is not None:
             response_payload['usage'] = result.get('usage')
-        return jsonify(response_payload)
+        return jsonify(response_payload), 200
     return jsonify({'error': 'Invalid response from LLM.'}), 500
 
 
