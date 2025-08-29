@@ -750,10 +750,10 @@
     renderFileList();
     if (el.previewPane) el.previewPane.innerHTML = '<div class="annotations">No file selected.</div>';
     if (el.chatContainer) {
-      const info = document.createElement('div');
-      info.className = 'annotations small';
-      info.innerText = 'Session-only chat (cleared on refresh)';
-      el.chatContainer.parentElement && el.chatContainer.parentElement.insertBefore(info, el.chatContainer);
+      //const info = document.createElement('div');
+      //info.className = 'annotations small';
+      //info.innerText = 'Session-only chat (cleared on refresh)';
+      //el.chatContainer.parentElement && el.chatContainer.parentElement.insertBefore(info, el.chatContainer);
     }
   }
 

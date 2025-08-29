@@ -249,7 +249,7 @@ button:disabled, .btn[disabled]{
   font-size:13px;
 }
 .timestamp{
-  color:var(--muted);
+  color:black;
   font-size:12px;
 }
 
